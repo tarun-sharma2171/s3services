@@ -11,7 +11,11 @@ exports.getObject = (req, res) => {
         }
         return res.send(object);
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        return res.json({
+            statusCode: 500,
+            message: error.message ? error.message : "Internal Server Error"
+        })
     }
 
 };
@@ -20,7 +24,7 @@ exports.putObject = (req, res) => {
     try {
         console.log(req.file.filename);
         return res.json({ success: true, message: 'File uploaded successfully', fileURL: `http://localhost:3000/storage/${req.params.bucket}/${req.file.filename}` });
-        } catch (error) {
+    } catch (error) {
         console.log(error)
         return res.status(500).send(error.message ? error.message : "Internal Server Error")
     }
@@ -28,11 +32,19 @@ exports.putObject = (req, res) => {
 };
 
 exports.deleteObject = (req, res) => {
-    const { bucket, filename } = req.params;
-    if (deleteObject(bucket, filename)) {
-        return res.send('Object deleted successfully');
-    } else {
-        return res.status(404).send('Object not found');
+    try {
+        const { bucket, filename } = req.params;
+        if (deleteObject(bucket, filename)) {
+            return res.send('Object deleted successfully');
+        } else {
+            return res.status(404).send('Object not found');
+        }
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            statusCode: 500,
+            message: error.message ? error.message : "Internal Server Error"
+        })
     }
 };
 
@@ -42,7 +54,10 @@ exports.listObjects = (req, res) => {
         const objects = listObjects(bucket);
         return res.send(objects);
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        return res.json({
+            statusCode: 500,
+            message: error.message ? error.message : "Internal Server Error"
+        })
     }
-
 };
